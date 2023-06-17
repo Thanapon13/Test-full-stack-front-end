@@ -1,23 +1,35 @@
-import { useEffect, useState } from "react";
-import { getUser } from "../apis/user-api";
 import ModalUser from "../components/ModalUser";
 import AddUser from "./AddUser";
 import defaultImage from "../assets/userPicture.png";
+import useUser from "../hooks/useUser";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
-  const [userData, setUserData] = useState([]);
-  console.log("userDatas:", userData);
+  const {
+    open,
+    userData,
+    handleDelete,
+    setInputFirstName,
+    setInputLastName,
+    setInputGender,
+    setInputBirthday,
+    handleCreateUser,
+    setOpen
+  } = useUser();
 
-  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const [error, setError] = useState({});
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const res = await getUser();
-      setUserData(res.data.users);
-      // console.log("res.data.users:", res.data.users);
-    };
-    fetchUser();
-  }, []);
+  const handleCreateUsers = () => {
+    handleCreateUser();
+    navigate(0);
+  };
+
+  const handleDeleteUser = userId => {
+    handleDelete(userId);
+    navigate(0);
+  };
 
   return (
     /* Container All */
@@ -90,6 +102,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium text-sm px-5 py-2.5 mr-2 mb-2"
+                  onClick={() => handleDeleteUser(item.id)}
                 >
                   Delete
                 </button>
@@ -100,7 +113,14 @@ export default function HomePage() {
       </table>
 
       <ModalUser open={open} onClose={() => setOpen(false)} title="Add User">
-        <AddUser onClose={() => setOpen(false)} />
+        <AddUser
+          onClose={() => setOpen(false)}
+          onFirstName={e => setInputFirstName(e.target.value)}
+          onLastName={e => setInputLastName(e.target.value)}
+          onGender={e => setInputGender(e.target.value)}
+          onBirthday={e => setInputBirthday(e.target.value)}
+          onClick={handleCreateUsers}
+        />
       </ModalUser>
     </div>
   );
