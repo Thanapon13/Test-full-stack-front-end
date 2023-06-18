@@ -1,29 +1,38 @@
 import ModalUser from "../components/ModalUser";
 import AddUser from "./AddUser";
-import defaultImage from "../assets/userPicture.png";
 import useUser from "../hooks/useUser";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ReadOnlyRow from "../components/ReadOnlyRow";
+import EditableRow from "../components/EditableRow";
 
 export default function HomePage() {
-  const {
-    open,
-    userData,
-    handleDelete,
-    setInputFirstName,
-    setInputLastName,
-    setInputGender,
-    setInputBirthday,
-    handleCreateUser,
-    setOpen
-  } = useUser();
+  const { open, userData, handleDelete, setOpen } = useUser();
+  console.log("userData:", userData);
 
   const navigate = useNavigate();
-  const [error, setError] = useState({});
 
-  const handleCreateUsers = () => {
-    handleCreateUser();
-    navigate(0);
+  const [editFormData, setEditFormData] = useState("");
+
+  const [editContactId, setEditContactId] = useState(null);
+
+  const handleEditClick = (event, item) => {
+    event.preventDefault();
+    setEditContactId(item.id);
+
+    const formValues = {
+      "First name": item["First name"],
+      "Last name": item["Last name"],
+      gender: item.gender,
+      "Birth date": item["Birth date"],
+      Image: item.Image
+    };
+
+    setEditFormData(formValues);
+  };
+
+  const handleCancelClick = () => {
+    setEditContactId(null);
   };
 
   const handleDeleteUser = userId => {
@@ -47,80 +56,58 @@ export default function HomePage() {
       </div>
 
       {/* Box Bottom */}
-      <table className="w-[90%] m-auto mt-6 text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead className="text-base text-gray-700 bg-gray-300 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" className="px-6 py-3">
-              Profile picture
-            </th>
+      <from>
+        <table className="w-[90%] m-auto mt-6 text-sm text-left text-gray-500 dark:text-gray-400">
+          <thead className="text-base text-gray-700 bg-gray-300 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" className="px-6 py-3">
+                Profile picture
+              </th>
 
-            <th scope="col" className="px-6 py-3">
-              First name
-            </th>
+              <th scope="col" className="px-6 py-3">
+                First name
+              </th>
 
-            <th scope="col" className="px-6 py-3">
-              Last name
-            </th>
+              <th scope="col" className="px-6 py-3">
+                Last name
+              </th>
 
-            <th scope="col" className="px-6 py-3">
-              Gender
-            </th>
+              <th scope="col" className="px-6 py-3">
+                Gender
+              </th>
 
-            <th scope="col" className="px-6 py-3">
-              Birthday
-            </th>
+              <th scope="col" className="px-6 py-3">
+                Birthday
+              </th>
 
-            <th scope="col" className="px-6 py-3">
-              Action
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {userData.map((item, idx) => (
-            <tr
-              className="bg-white border-b dark:bg-gray-900 dark:border-gray-700 text-black text-lg"
-              key={idx}
-            >
-              <td className="px-6 py-4 ">
-                <img
-                  src={item.Image || defaultImage}
-                  alt="UserImage"
-                  className="rounded-full cursor-pointer w-[60px]"
-                />
-              </td>
-              <td className="px-6 py-4">{item["First name"]}</td>
-              <td className="px-6 py-4">{item["Last name"]}</td>
-              <td className="px-6 py-4">{item.gender}</td>
-              <td className="px-6 py-4">{item["Birth date"]}</td>
-              <td className="px-6 py-4">
-                <button
-                  type="button"
-                  className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 font-medium text-sm px-5 py-2.5 mr-2 mb-2"
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium text-sm px-5 py-2.5 mr-2 mb-2"
-                  onClick={() => handleDeleteUser(item.id)}
-                >
-                  Delete
-                </button>
-              </td>
+              <th scope="col" className="px-6 py-3">
+                Action
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {userData.map((item, idx) => (
+              <Fragment>
+                {editContactId === item.id ? (
+                  <EditableRow
+                    handleCancelClick={handleCancelClick}
+                    editFormData={editFormData}
+                  />
+                ) : (
+                  <ReadOnlyRow
+                    item={item}
+                    handleDeleteUser={handleDeleteUser}
+                    handleEditClick={handleEditClick}
+                  />
+                )}
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+      </from>
 
       <ModalUser open={open} onClose={() => setOpen(false)} title="Add User">
-        <AddUser
-          onClose={() => setOpen(false)}
-          onFirstName={e => setInputFirstName(e.target.value)}
-          onLastName={e => setInputLastName(e.target.value)}
-          onGender={e => setInputGender(e.target.value)}
-          onBirthday={e => setInputBirthday(e.target.value)}
-          onClick={handleCreateUsers}
-        />
+        <AddUser onClose={() => setOpen(false)} />
       </ModalUser>
     </div>
   );

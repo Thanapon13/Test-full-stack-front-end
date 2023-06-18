@@ -1,29 +1,38 @@
 import { useRef, useState } from "react";
 import Avatar from "../components/Avatar";
-import profileImage from "../assets/userPicture.png";
 import InputAdduser from "../components/InputAdduser";
 import useUser from "../hooks/useUser";
+import { useNavigate } from "react-router-dom";
+import useLoading from "../hooks/useLoading";
 
-export default function AddUser({
-  onClose,
-  onFirstName,
-  onLastName,
-  onGender,
-  onBirthday,
-  onClick
-}) {
-  const { userData } = useUser();
+export default function AddUser({ onClose }) {
+  const {
+    userData,
+    setInputFirstName,
+    setInputLastName,
+    setInputGender,
+    setInputBirthday,
+    handleSubmitForm,
+    file,
+    setFile
+  } = useUser();
   console.log("userData:", userData);
-  const inputEl = useRef();
 
-  const [file, setFile] = useState(null);
+  const { startLoading } = useLoading();
+  const inputEl = useRef();
+  const navigate = useNavigate();
+
+  const handleStartLoading = () => {
+    startLoading();
+  };
 
   return (
     <div>
-      {/* Content */}
-      <div className="flex justify-around items-center">
-        {/* Picture */}
-
+      {/* From input */}
+      <form
+        onSubmit={handleSubmitForm}
+        className="flex flex-wrap justify-around items-center gap-2"
+      >
         <div className="flex flex-col gap-4 items-center p-4">
           <Avatar
             src={file ? URL.createObjectURL(file) : userData.Image}
@@ -60,75 +69,74 @@ export default function AddUser({
             Delete Picture
           </button>
         </div>
+        {/* Picture */}
 
-        {/* From input */}
+        {/* Content */}
         <div>
-          <form className="flex flex-col flex-wrap gap-2">
-            <div className="flex gap-6 flex-wrap">
-              <div className="flex flex-col gap-2">
-                <label className="text-gray-600">First Name</label>
-                <InputAdduser
-                  placeholder="Plese enter First name"
-                  onChange={onFirstName}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-gray-600">Last Name</label>
-
-                <InputAdduser
-                  placeholder="Plese enter Last name"
-                  onChange={onLastName}
-                />
-              </div>
+          <div className="flex gap-6 flex-wrap">
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-600">First Name</label>
+              <InputAdduser
+                placeholder="Plese enter First name"
+                onChange={e => setInputFirstName(e.target.value)}
+              />
             </div>
 
-            <div className="flex gap-6 flex-wrap">
-              <div className="flex flex-col gap-2">
-                <label className="text-gray-600">Gender</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-600">Last Name</label>
 
-                <select
-                  id="countries"
-                  className="border-2 border-gray-400 focus:ring-0 focus:border-black rounded-xl"
-                  onChange={onGender}
-                >
-                  <option value="">Please select gender...</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-gray-600">Birthday</label>
-                <input
-                  type="date"
-                  placeholder="Plese enter Last name"
-                  className="border-2 border-gray-400 focus:ring-0 focus:border-black  rounded-xl"
-                  onChange={onBirthday}
-                />
-              </div>
+              <InputAdduser
+                placeholder="Plese enter Last name"
+                onChange={e => setInputLastName(e.target.value)}
+              />
             </div>
-          </form>
+          </div>
+
+          <div className="flex gap-6 flex-wrap">
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-600">Gender</label>
+
+              <select
+                id="countries"
+                className="border-2 border-gray-400 focus:ring-0 focus:border-black rounded-xl"
+                onChange={e => setInputGender(e.target.value)}
+              >
+                <option value="">Please select gender...</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-600">Birthday</label>
+              <input
+                type="date"
+                placeholder="Plese enter Last name"
+                className="border-2 border-gray-400 focus:ring-0 focus:border-black  rounded-xl"
+                onChange={e => setInputBirthday(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Button */}
-      <div className="flex justify-end items-center p-6 gap-2">
-        <button
-          type="button"
-          className="text-white bg-gray-600 hover:bg-gray-500 font-medium rounded-lg text-sm px-5 py-2.5"
-          onClick={onClose}
-        >
-          CANCEL
-        </button>
-        <button
-          type="button"
-          className="text-white bg-green-600 hover:bg-green-800 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5"
-          onClick={onClick}
-        >
-          SAVE
-        </button>
-      </div>
+        {/* Button */}
+        <div className="w-full flex justify-end items-center p-6 gap-2">
+          <button
+            type="button"
+            className="text-white bg-gray-600 hover:bg-gray-500 font-medium rounded-lg text-sm px-5 py-2.5"
+            onClick={onClose}
+          >
+            CANCEL
+          </button>
+          <button
+            type="submit"
+            className="text-white bg-green-600 hover:bg-green-800 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5"
+            onClick={handleStartLoading}
+          >
+            SAVE
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
