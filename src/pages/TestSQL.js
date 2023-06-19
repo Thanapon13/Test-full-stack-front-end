@@ -31,7 +31,6 @@
 //   });
 
 // 4.5 UPDATE Brand ของ PRODUCT ที่มีDescription เป็น Toy Story ให้Brand เป็น W
-await Product.update({
-  {Brand: "W"},{where: { Description: "Toy Story"}}
-});
-
+// ตอบ await Product.update({
+//   {Brand: "W"},{where: { Description: "Toy Story"}}
+// });
