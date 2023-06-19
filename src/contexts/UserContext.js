@@ -1,23 +1,10 @@
 import { createContext, useEffect, useState } from "react";
-import { getUser, deleteUser, createUser } from "../apis/user-api";
-import useLoading from "../hooks/useLoading";
+import { getUser } from "../apis/user-api";
 
 export const UserContext = createContext();
 
 export default function UserContextProvider({ children }) {
-  const { stopLoading } = useLoading();
   const [userData, setUserData] = useState([]);
-  // console.log("userDatas:", userData);
-  const [open, setOpen] = useState(false);
-  const [file, setFile] = useState(null);
-  const [inputFirstName, setInputFirstName] = useState("");
-  console.log("inputFirstName:", inputFirstName);
-  const [inputLastName, setInputLastName] = useState("");
-  console.log("inputLastName:", inputLastName);
-  const [inputGender, setInputGender] = useState("");
-  console.log("inputGender:", inputGender);
-  const [inputBirthday, setInputBirthday] = useState("");
-  console.log("inputBirthday:", inputBirthday);
 
   //Get User
   useEffect(() => {
@@ -29,45 +16,56 @@ export default function UserContextProvider({ children }) {
     fetchUser();
   }, []);
 
-  // Create User
-  const handleSubmitForm = async e => {
-    try {
-      e.preventDefault();
-      const formData = new FormData();
-      formData.append("Image", file);
-      formData.append("First name", inputFirstName);
-      formData.append("Last name", inputLastName);
-      formData.append("gender", inputGender);
-      formData.append("Birth date", inputBirthday);
-      // console.log("formData:", formData);
+  // Pagination
+  const [listUserData, setListUserData] = useState(userData);
+  // console.log("listUserData:", listUserData);
 
-      await createUser(formData);
-      stopLoading();
-      setOpen(false);
-    } catch (error) {
-      console.error("เกิดข้อผิดพลาดในการสร้างคำสั่ง :", error);
-    }
+  useEffect(() => {
+    setListUserData(userData);
+  }, [userData]);
+
+  const [dataInPage, setDataInPage] = useState([]);
+  // console.log("dataInPage", dataInPage);
+  const [page, setPage] = useState(0);
+  // console.log("page", page);
+
+  const userPerPage = 3;
+
+  const pagination = () => {
+    const pages = Math.ceil(listUserData.length / userPerPage);
+
+    const newPaymentUser = Array.from({ length: pages }, (el, idx) => {
+      const start = idx * userPerPage;
+      return listUserData.slice(start, start + userPerPage);
+    });
+    return newPaymentUser;
   };
 
-  // Delete User
-  const handleDelete = async userId => {
-    await deleteUser(userId);
+  const handlePage = index => {
+    setPage(index);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  useEffect(() => {
+    const paginate = pagination();
+    setDataInPage(paginate);
+    setListUserData(paginate[page] || []);
+  }, [page]);
+
+  useEffect(() => {
+    const paginate = pagination();
+    setDataInPage(paginate);
+    setPage(0);
+  }, [listUserData]);
 
   return (
     <UserContext.Provider
       value={{
         userData,
-        handleDelete,
-        setInputFirstName,
-        setInputLastName,
-        setInputGender,
-        setInputBirthday,
-        handleSubmitForm,
-        open,
-        setOpen,
-        file,
-        setFile
+        handlePage,
+        pagination,
+        page,
+        dataInPage
       }}
     >
       {children}

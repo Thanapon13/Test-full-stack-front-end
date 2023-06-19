@@ -1,7 +1,7 @@
 import React from "react";
 import defaultImage from "../assets/userPicture.png";
 
-const ReadOnlyRow = ({ item, handleDeleteUser, handleEditClick }) => {
+const ReadOnlyRow = ({ item, handleDelete, handleEditClick }) => {
   return (
     <tr className="bg-white border-b dark:bg-gray-900 dark:border-gray-700 text-black text-lg">
       <td className="px-6 py-4 ">
@@ -13,7 +13,7 @@ const ReadOnlyRow = ({ item, handleDeleteUser, handleEditClick }) => {
       </td>
       <td className="px-6 py-4">{item["First name"]}</td>
       <td className="px-6 py-4">{item["Last name"]}</td>
-      <td className="px-6 py-4">{item.gender}</td>
+      <td className="px-6 py-4">{item.gender} </td>
       <td className="px-6 py-4">{item["Birth date"]}</td>
       <td className="px-6 py-4">
         <button
@@ -26,7 +26,7 @@ const ReadOnlyRow = ({ item, handleDeleteUser, handleEditClick }) => {
         <button
           type="button"
           className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium text-sm px-5 py-2.5 mr-2 mb-2"
-          onClick={() => handleDeleteUser(item.id)}
+          onClick={handleDelete}
         >
           Delete
         </button>
